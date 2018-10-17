@@ -237,15 +237,31 @@ y : prediction</p>
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="uwnet.model.MLP">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">MLP</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>time_step</em>, <em>inputs=(('LHF'</em>, <em>1)</em>, <em>('SHF'</em>, <em>1)</em>, <em>('SOLIN'</em>, <em>1)</em>, <em>('QT'</em>, <em>34)</em>, <em>('SLI'</em>, <em>34)</em>, <em>('FQT'</em>, <em>34)</em>, <em>('FSLI'</em>, <em>34))</em>, <em>outputs=(('SLI'</em>, <em>34)</em>, <em>('QT'</em>, <em>34))</em>, <em>add_forcing=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">MLP</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>time_step</em>, <em>inputs=(('LHF'</em>, <em>1)</em>, <em>('SHF'</em>, <em>1)</em>, <em>('SOLIN'</em>, <em>1)</em>, <em>('QT'</em>, <em>34)</em>, <em>('SLI'</em>, <em>34)</em>, <em>('FQT'</em>, <em>34)</em>, <em>('FSLI'</em>, <em>34))</em>, <em>outputs=(('SLI'</em>, <em>34)</em>, <em>('QT'</em>, <em>34))</em>, <em>forcings=()</em>, <em>add_forcing=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>add_forcing <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd>If true, FQT, FU, etc in the inputs to MLP.forward will be added to the
 produce the final tendencies.</dd>
+<dt>forcings</dt>
+<dd>List of tuples of the form (prognostic_var_name, num), where
+prognostic_var_name is one of the inputs. The input batch dictionary
+should contain the key ‘F&lt;prognostic_var_name&gt;’</dd>
 </dl>
 <dl class="method">
+<dt id="uwnet.model.MLP.call_with_numpy_dict">
+<code class="descname">call_with_numpy_dict</code><span class="sig-paren">(</span><em>inputs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.call_with_numpy_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the neural network with numpy inputs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="uwnet.model.MLP.call_with_xr">
+<code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>ds</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.call_with_xr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the neural network with xarray inputs</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="uwnet.model.MLP.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em>, <em>n=None</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.forward" title="Permalink to this definition">¶</a></dt>
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em>, <em>n=None</em>, <em>dt=None</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>x</dt>
 <dd>variables. predictions will be made for all time points not
@@ -253,6 +269,8 @@ included in the prognostic varibles in  x.</dd>
 <dt>n <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd>number of time steps of prognostic varibles to use before starting
 prediction</dd>
+<dt>dt <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>time step, defaults to self.time_step</dd>
 </dl>
 <dl class="docutils">
 <dt>outputs</dt>
@@ -272,6 +290,7 @@ sets</p>
 <dt id="uwnet.model.MLP.rhs">
 <code class="descname">rhs</code><span class="sig-paren">(</span><em>aux</em>, <em>progs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.rhs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated source terms and diagnostics</p>
+<p>All inputs have shape (<em>, z, y, x) or (</em>, y, x)</p>
 </dd></dl>
 
 <dl class="method">
