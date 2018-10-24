@@ -162,25 +162,24 @@
 <span id="datasets"></span><h2>Datasets<a class="headerlink" href="#module-uwnet.datasets" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="uwnet.datasets.XRTimeSeries">
-<em class="property">class </em><code class="descclassname">uwnet.datasets.</code><code class="descname">XRTimeSeries</code><span class="sig-paren">(</span><em>data</em>, <em>dims</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.datasets.</code><code class="descname">XRTimeSeries</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pytorch Dataset class for time series data in xarray format</p>
-<dl class="docutils">
-<dt>data <span class="classifier-delimiter">:</span> <span class="classifier">xr.Dataset</span></dt>
-<dd>input data</dd>
-<dt>dims <span class="classifier-delimiter">:</span> <span class="classifier">seq</span></dt>
-<dd><p class="first">list of dimensions used to reshape the data. Format:</p>
-<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">time_dims</span><span class="p">,</span> <span class="n">batch_dims</span><span class="p">,</span> <span class="n">feature_dims</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd>
-</dl>
+<p>This function assumes the data has dimensions [‘time’, ‘z’, ‘y’, ‘x’], and
+that the axes of the data arrays are all stored in that order.</p>
+<p>data : xr.Dataset</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s2">&quot;in.nc&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">XRTimeSeries</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">XRTimeSeries</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
-<dl class="method">
-<dt id="uwnet.datasets.XRTimeSeries.constants">
-<code class="descname">constants</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.constants" title="Permalink to this definition">¶</a></dt>
+<dl class="attribute">
+<dt id="uwnet.datasets.XRTimeSeries.batch_dims">
+<code class="descname">batch_dims</code><em class="property"> = ['y', 'x']</em><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.batch_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="uwnet.datasets.XRTimeSeries.dims">
+<code class="descname">dims</code><em class="property"> = ['time', 'z', 'x', 'y']</em><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.dims" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -236,96 +235,36 @@ y : prediction</p>
 <div class="section" id="module-uwnet.model">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="uwnet.model.MLP">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">MLP</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>time_step</em>, <em>inputs=(('LHF'</em>, <em>1)</em>, <em>('SHF'</em>, <em>1)</em>, <em>('SOLIN'</em>, <em>1)</em>, <em>('QT'</em>, <em>34)</em>, <em>('SLI'</em>, <em>34)</em>, <em>('FQT'</em>, <em>34)</em>, <em>('FSLI'</em>, <em>34))</em>, <em>outputs=(('SLI'</em>, <em>34)</em>, <em>('QT'</em>, <em>34))</em>, <em>forcings=()</em>, <em>add_forcing=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>add_forcing <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd>If true, FQT, FU, etc in the inputs to MLP.forward will be added to the
-produce the final tendencies.</dd>
-<dt>forcings</dt>
-<dd>List of tuples of the form (prognostic_var_name, num), where
-prognostic_var_name is one of the inputs. The input batch dictionary
-should contain the key ‘F&lt;prognostic_var_name&gt;’</dd>
-</dl>
+<dt id="uwnet.model.ApparentSource">
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ApparentSource</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>inputs=(('LHF'</em>, <em>1)</em>, <em>('SHF'</em>, <em>1)</em>, <em>('SOLIN'</em>, <em>1)</em>, <em>('QT'</em>, <em>34)</em>, <em>('SLI'</em>, <em>34)</em>, <em>('FQT'</em>, <em>34)</em>, <em>('FSLI'</em>, <em>34))</em>, <em>outputs=(('SLI'</em>, <em>34)</em>, <em>('QT'</em>, <em>34))</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>PyTorch module for predicting Q1, Q2 and maybe Q3</p>
 <dl class="method">
-<dt id="uwnet.model.MLP.call_with_numpy_dict">
-<code class="descname">call_with_numpy_dict</code><span class="sig-paren">(</span><em>inputs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.call_with_numpy_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call the neural network with numpy inputs</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="uwnet.model.MLP.call_with_xr">
-<code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>ds</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.call_with_xr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call the neural network with xarray inputs</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="uwnet.model.MLP.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em>, <em>n=None</em>, <em>dt=None</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.forward" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>x</dt>
-<dd>variables. predictions will be made for all time points not
-included in the prognostic varibles in  x.</dd>
-<dt>n <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>number of time steps of prognostic varibles to use before starting
-prediction</dd>
-<dt>dt <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd>time step, defaults to self.time_step</dd>
-</dl>
-<dl class="docutils">
-<dt>outputs</dt>
-<dd>dictionary of output_fields variables including prognostics and
-diagnostics</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="uwnet.model.MLP.progs">
-<code class="descname">progs</code><a class="headerlink" href="#uwnet.model.MLP.progs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prognostic variables are shared between the input and output
-sets</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="uwnet.model.MLP.rhs">
-<code class="descname">rhs</code><span class="sig-paren">(</span><em>aux</em>, <em>progs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.rhs" title="Permalink to this definition">¶</a></dt>
+<dt id="uwnet.model.ApparentSource.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated source terms and diagnostics</p>
 <p>All inputs have shape (<em>, z, y, x) or (</em>, y, x)</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="uwnet.model.MLP.step">
-<code class="descname">step</code><span class="sig-paren">(</span><em>x</em>, <em>dt</em>, <em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform one time step using the neural network</p>
-<dl class="docutils">
-<dt>x <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd>dict of torch arrays (input variables)</dd>
-<dt>dt <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd>the timestep in seconds</dd>
-<dt><a href="#id1"><span class="problematic" id="id2">*</span></a>args</dt>
-<dd>not used</dd>
-</dl>
-<dl class="docutils">
-<dt>out <span class="classifier-delimiter">:</span> <span class="classifier">dict of torch arrays</span></dt>
-<dd>dict of the predictands. Either the next time step for the
-prognostic variables, or the predicted value for the
-non-prognostics (e.g. LHF, SHF, Prec).</dd>
-<dt>None</dt>
-<dd>placeholder to work with legacy code.</dd>
-</dl>
 </dd></dl>
 
+<dl class="class">
+<dt id="uwnet.model.ForcedStepper">
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ForcedStepper</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>time_step</em>, <em>auxiliary=()</em>, <em>prognostic=()</em>, <em>diagnostic=()</em>, <em>forcing=()</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ForcedStepper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single Column Model Stepper</p>
+<p>Integrates the single column equations with the trapezoid rule:</p>
+<blockquote>
+<div>x_n+1 = x_n + f(x_n) dt + (g(t_n) + g(t_n+1)) dt / 2</div></blockquote>
 <dl class="method">
-<dt id="uwnet.model.MLP.train">
-<code class="descname">train</code><span class="sig-paren">(</span><em>val=True</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MLP.train" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the module in training mode.</p>
-<p>This has any effect only on certain modules. See documentations of
-particular modules for details of their behaviors in training/evaluation
-mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
-etc.</p>
+<dt id="uwnet.model.ForcedStepper.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em>, <em>n=None</em>, <em>n_prog=None</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ForcedStepper.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce an n-step prediction for single column mode</p>
 <dl class="docutils">
-<dt>Returns:</dt>
-<dd>Module: self</dd>
+<dt>x <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>a dict of torch tensors containing all the keys in the prognostic, diagnostic, and forcing attributes</dd>
+<dt>n <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>the number of time steps to produce a prediction for</dd>
+<dt>n_prog <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>the number of burn-in-steps. The prediction only begins after n_prog steps.</dd>
 </dl>
 </dd></dl>
 
@@ -357,6 +296,13 @@ registered hooks while the latter silently ignores them.</p>
 and arguments</p>
 <p>args
 kwargs</p>
+<p>To easily get this to work with a new class add these lines at the top of
+the __init__ method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;self&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__class__&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="class">
@@ -367,10 +313,22 @@ kwargs</p>
 
 <dl class="class">
 <dt id="uwnet.model.VariableSpec">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">VariableSpec</code><span class="sig-paren">(</span><em>name</em>, <em>num</em>, <em>positive=False</em>, <em>conserved=False</em>, <em>units=''</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.VariableSpec" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">VariableSpec</code><span class="sig-paren">(</span><em>name</em>, <em>num</em>, <em>positive=False</em>, <em>conserved=False</em>, <em>units=''</em>, <em>z_axis=-3</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.VariableSpec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specification data for variable inputs</p>
 <p>This class allows passing relevant metadata such as physical units,
 dimension, and name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.model.call_with_numpy_dict">
+<code class="descclassname">uwnet.model.</code><code class="descname">call_with_numpy_dict</code><span class="sig-paren">(</span><em>self</em>, <em>inputs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.call_with_numpy_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the neural network with numpy inputs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.model.call_with_xr">
+<code class="descclassname">uwnet.model.</code><code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>self</em>, <em>ds</em>, <em>drop_times=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.call_with_xr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the neural network with xarray inputs</p>
 </dd></dl>
 
 </div>
