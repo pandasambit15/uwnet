@@ -2,8 +2,10 @@
 ./_sources/constraints.md.txt
 ./_sources/index.rst.txt
 ./_sources/post-processing.rst.txt
+./_sources/quickstart.rst.txt
 ./_sources/sam.md.txt
 ./_sources/smoother.rst.txt
+./_sources/training-data-header.rst.txt
 ./_sources/training.rst.txt
 ./_static/ajax-loader.gif
 ./_static/basic.css
@@ -73,8 +75,10 @@
 ./objects.inv
 ./post-processing.html
 ./py-modindex.html
+./quickstart.html
 ./sam.html
 ./search.html
 ./searchindex.js
 ./smoother.html
+./training-data-header.html
 ./training.html

@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quickstart &mdash; UWNET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Post Processing NGAqua" href="post-processing.html" />
+    <link rel="prev" title="Welcome to UWNET’s documentation!" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> UWNET
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-the-dependencies">Installing the dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#downloading-the-data">Downloading the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#training-the-neural-network">Training the neural network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#training-outputs">Training Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-a-single-column-model-simulation">Running a single column model simulation</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Scientific Description</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="post-processing.html">Post Processing NGAqua</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">Training Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="constraints.html">Physical constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sam.html">The System for Atmospheric Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training-data-header.html">Training Data Header</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smoother.html">Biharmonic Smoother</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Software Implementation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">UWNET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Quickstart</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>This guide is meant to get a new user to this code base up and running quickly.
+This code can be downloaded from github using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nbren12</span><span class="o">/</span><span class="n">uwnet</span>
+</pre></div>
+</div>
+<p>Once that is done downloading, you will need to download all the libraries and
+packages this code depends upon. To do this, I recommend installing the latest
+version of <a class="reference external" href="https://conda.io/miniconda.html">miniconda</a>. If you have installed that succesfully, the <code class="docutils literal notranslate"><span class="pre">conda</span></code>
+command should be available at the command line.</p>
+<div class="section" id="installing-the-dependencies">
+<h2>Installing the dependencies<a class="headerlink" href="#installing-the-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Now you can change into the <code class="docutils literal notranslate"><span class="pre">uwnet</span></code> directory.</p>
+<p>This project includes a file <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> which contains all the details
+that <a class="reference external" href="https://conda.io/miniconda.html">miniconda</a> needs to configure the environment. The environment can be setup
+by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">create_environment</span>
+</pre></div>
+</div>
+<p>If succesful, this message should appear:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">New</span> <span class="n">Environment</span> <span class="n">created</span><span class="o">...</span><span class="n">activate</span> <span class="n">by</span> <span class="n">typing</span>
+<span class="go">    source activate uwnet&quot;</span>
+</pre></div>
+</div>
+<p>From now on, you will need to enter type this command before running any of the
+scripts in this project.</p>
+</div>
+<div class="section" id="downloading-the-data">
+<h2>Downloading the data<a class="headerlink" href="#downloading-the-data" title="Permalink to this headline">¶</a></h2>
+<p>The data used for training is a netCDF file that is around 5 GB in size.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The data is available by request at the moment, but I plan to upload it to
+Zenodo soon. The header for the data needs to look like this: <span class="xref std std-ref">dataheader</span>.</p>
+</div>
+</div>
+<div class="section" id="training-the-neural-network">
+<h2>Training the neural network<a class="headerlink" href="#training-the-neural-network" title="Permalink to this headline">¶</a></h2>
+<p>Now that you have downloaded the data and installed the necessary software
+dependencies, you should be able to train a neural network by typing in the
+following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">train</span> <span class="k">with</span> <span class="n">data</span><span class="o">=&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">dataset</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This script can be trained with many different options, the default options can
+be seen using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">train</span> <span class="n">print_config</span>
+</pre></div>
+</div>
+<p>For instance, to change the learning rate used in the stochastic gradient
+descent, you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">train</span> <span class="k">with</span> <span class="n">data</span><span class="o">=&lt;</span><span class="n">path</span><span class="o">&gt;</span> <span class="n">lr</span><span class="o">=.</span><span class="mi">001</span>
+</pre></div>
+</div>
+<p>By default the script saves the data to a unique directory named like
+models/RUNID where RUNID is a unique key in database. This is useful because it
+allows keeping track of old experiments, but needs MongoDB to be installed to
+work. To avoid this, it is possible to save the data to a directory of your
+choice by including <code class="docutils literal notranslate"><span class="pre">output_dir=&lt;path</span> <span class="pre">to</span> <span class="pre">desired</span> <span class="pre">output_dir&gt;</span></code> after the
+<code class="docutils literal notranslate"><span class="pre">with</span></code>. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">train</span> <span class="k">with</span> <span class="n">data</span><span class="o">=&lt;</span><span class="n">path</span><span class="o">&gt;</span> <span class="n">lr</span><span class="o">=.</span><span class="mi">001</span> <span class="n">output_dir</span><span class="o">=&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">desired</span> <span class="n">output_dir</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="training-outputs">
+<h2>Training Outputs<a class="headerlink" href="#training-outputs" title="Permalink to this headline">¶</a></h2>
+<p>After training this output directory will contain files like these:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.</span><span class="n">pkl</span>
+<span class="mf">2.</span><span class="n">pkl</span>
+<span class="n">q2_1</span><span class="o">-</span><span class="mf">0.</span><span class="n">png</span>
+<span class="n">q2_2</span><span class="o">-</span><span class="mf">0.</span><span class="n">png</span>
+<span class="n">scatter_fqt_q2_1</span><span class="o">-</span><span class="mf">0.</span><span class="n">png</span>
+<span class="n">scatter_fqt_q2_2</span><span class="o">-</span><span class="mf">0.</span><span class="n">png</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">.pkl</span></code> files contain the saved neural network models and the image files
+show some diagnostics that helpful for tracking the progress of the training.</p>
+</div>
+<div class="section" id="running-a-single-column-model-simulation">
+<h2>Running a single column model simulation<a class="headerlink" href="#running-a-single-column-model-simulation" title="Permalink to this headline">¶</a></h2>
+<p>The model can be used to run a single column model simulation like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">columns</span> <span class="o">&lt;</span><span class="n">model</span><span class="o">&gt;.</span><span class="n">pkl</span> <span class="n">training_data_netcdf</span><span class="o">.</span><span class="n">nc</span> <span class="o">&lt;</span><span class="n">output</span> <span class="n">path</span><span class="o">&gt;.</span><span class="n">nc</span>
+</pre></div>
+</div>
+<p>This saves the predicted version of the prognostic values (e.g. QT, SLI), and
+the corresponding parametrized sources in (e.g. FQTNN, SLINN). This script
+(which is located at <code class="docutils literal notranslate"><span class="pre">uwnet/columns.py</span></code>) also provides an example of how to
+load and run a model in a python script or jupyter notebook. This <a href="#id1"><span class="problematic" id="id2">`jupyer
+notebook&lt;https://atmos.washington.edu/~nbren12/reports/uwnet/notebooks/2018-10-27-spinup-error.html&gt;`_</span></a>
+is a good example.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="post-processing.html" class="btn btn-neutral float-right" title="Post Processing NGAqua" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to UWNET’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Noah D. Brenowitz
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

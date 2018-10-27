@@ -28,8 +28,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Biharmonic Smoother" href="smoother.html" />
-    <link rel="prev" title="The System for Atmospheric Modeling" href="sam.html" /> 
+    <link rel="prev" title="Biharmonic Smoother" href="smoother.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -78,12 +77,21 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Scientific Description</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="post-processing.html">Post Processing NGAqua</a></li>
 <li class="toctree-l1"><a class="reference internal" href="training.html">Training Procedure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="constraints.html">Physical constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sam.html">The System for Atmospheric Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training-data-header.html">Training Data Header</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smoother.html">Biharmonic Smoother</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Software Implementation</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-uwnet.datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-uwnet.loss">Loss Functions</a></li>
@@ -91,7 +99,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#custom-pytorch-modules">Custom PyTorch Modules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="smoother.html">Biharmonic Smoother</a></li>
 </ul>
 
             
@@ -231,6 +238,18 @@ that the axes of the data arrays are all stored in that order.</p>
 y : prediction</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="uwnet.loss.compute_multiple_step_loss">
+<code class="descclassname">uwnet.loss.</code><code class="descname">compute_multiple_step_loss</code><span class="sig-paren">(</span><em>criterion</em>, <em>model</em>, <em>batch</em>, <em>prognostics</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.compute_multiple_step_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the loss across multiple time steps with an Euler stepper</p>
+<dl class="docutils">
+<dt>t: int</dt>
+<dd>the time step of the prediction</dd>
+<dt>prediction: dict</dt>
+<dd>the predicted state</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-uwnet.model">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
@@ -238,6 +257,12 @@ y : prediction</p>
 <dt id="uwnet.model.ApparentSource">
 <em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ApparentSource</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>inputs=(('LHF'</em>, <em>1)</em>, <em>('SHF'</em>, <em>1)</em>, <em>('SOLIN'</em>, <em>1)</em>, <em>('QT'</em>, <em>34)</em>, <em>('SLI'</em>, <em>34)</em>, <em>('FQT'</em>, <em>34)</em>, <em>('FSLI'</em>, <em>34))</em>, <em>outputs=(('SLI'</em>, <em>34)</em>, <em>('QT'</em>, <em>34))</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>PyTorch module for predicting Q1, Q2 and maybe Q3</p>
+<dl class="method">
+<dt id="uwnet.model.ApparentSource.call_with_xr">
+<code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>ds</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource.call_with_xr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the neural network with xarray inputs</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="uwnet.model.ApparentSource.forward">
 <code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource.forward" title="Permalink to this definition">¶</a></dt>
@@ -386,10 +411,8 @@ registered hooks while the latter silently ignores them.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="smoother.html" class="btn btn-neutral float-right" title="Biharmonic Smoother" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="sam.html" class="btn btn-neutral" title="The System for Atmospheric Modeling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="smoother.html" class="btn btn-neutral" title="Biharmonic Smoother" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
