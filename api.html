@@ -250,6 +250,22 @@ y : prediction</p>
 </dl>
 </dd></dl>
 
+<dl class="function">
+<dt id="uwnet.loss.weighted_mean_squared_error">
+<code class="descclassname">uwnet.loss.</code><code class="descname">weighted_mean_squared_error</code><span class="sig-paren">(</span><em>truth</em>, <em>prediction</em>, <em>weights</em>, <em>dim=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.weighted_mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the weighted mean squared error</p>
+<p>truth: torch.tensor
+prediction: torch.tensor
+weights: torch.tensor</p>
+<blockquote>
+<div>one dimensional tensor of weights. Must be the same length as the truth
+and prediction arrays along the dimension <cite>dim</cite></div></blockquote>
+<dl class="docutils">
+<dt>dim:</dt>
+<dd>the dimension the data should be weighted along</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-uwnet.model">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
