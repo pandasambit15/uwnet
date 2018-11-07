@@ -33,6 +33,48 @@ def _ds_slice_to_torch(ds):
                   _ds_slice_to_numpy_dict(ds))
 
 
+class XarrayPoints(Dataset):
+    """
+    """
+
+    def __init__(self, data, batch_dims=('time', 'y', 'x')):
+        """Initialize XRTimeSeries.
+
+        """
+        self.data = data
+        self.numpy_data = {key: data[key].values for key in data.data_vars}
+        self.data_vars = set(data.data_vars)
+        self.batch_dims = batch_dims
+        self.dims = {key: data[key].dims for key in data.data_vars}
+
+    def __len__(self):
+        return np.prod(self.batch_shape)
+
+    @property
+    def batch_shape(self):
+        return [len(self.data[dim]) for dim in self.batch_dims]
+
+    def __getitem__(self, i):
+
+        # convert i to an array
+        # this code should handle i = slice, list, etc
+        i = np.arange(len(self))[i]
+
+        # get coordinates using np.unravel_index
+        # this code should probably be refactored
+
+        idxs = np.unravel_index(i, self.batch_shape)
+        output_tensors = {}
+        for key in self.data_vars:
+            data_array = self.numpy_data[key]
+            if 'z' in self.dims[key]:
+                this_array_index = idxs[:1] + (slice(None),) + idxs[1:]
+            else:
+                this_array_index = idxs
+            output_tensors[key] = data_array[this_array_index].astype(np.float32)
+
+        return output_tensors
+
 class XRTimeSeries(Dataset):
     """A pytorch Dataset class for time series data in xarray format
 

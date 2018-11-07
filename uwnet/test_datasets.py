@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from uwnet.datasets import XRTimeSeries
+from uwnet.datasets import XRTimeSeries, XarrayPoints
 
 
 def get_obj():
@@ -59,3 +59,16 @@ def test_XRTimeSeries_torch_constants():
 
     # constants should not be in batch
     assert 'layer_mass' not in dataset[0]
+
+
+def test_XarrayPoints():
+    ds, (t, z, y, x) = get_obj()
+    dataset = XarrayPoints(ds)
+
+    # get the right lengths
+    assert len(dataset) == t * y * x
+
+    out = dataset[0]
+    assert out['a'].shape == (z,)
+
+    dataset[-1]
