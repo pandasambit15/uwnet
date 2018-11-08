@@ -99,34 +99,27 @@ def _remove_null_dims(x):
         return x.squeeze(-1).squeeze(-1)
     return {key: _(val) for key, val in x.items()}
 
-class EulerStep(nn.Module):
-    def __init__(self, model, keys, dt):
-        super(EulerStep, self).__init__()
 
-        self.model = model
-        self.keys = keys
-        self.dt = dt
+def euler_step(sources, states, keys):
+    prediction = {}
+    for key in keys:
+        state = states[key]
+        forcing_key = 'F' + key
+        known_forcing = states[forcing_key]
+        prediction[key] = state + dt * sources[key] + dt * 86400 * known_forcing
+    return prediction
 
-    def forward(self, x):
-        # x = _add_null_dims(x)
-        prediction = {}
-        scaled = self.model.scaler(x)
-        sources = self.model(scaled)
-        for key in self.keys:
-            state = x[key]
-            forcing_key = 'F' + key
-            prediction[key] = state + dt * sources[key] + dt * 86400 * x[forcing_key]
-        return prediction
-
-
-stepper = EulerStep(model, ['QT', 'SLI'], dt)
 
 def train_and_store_loss(engine, batch):
     x, y = batch
     x = _add_null_dims(x)
     y = _add_null_dims(y)
 
-    predictions = stepper(x)
+    keys = ['QT', 'SLI']
+    scaled = model.scaler(x)
+    sources = model(scaled)
+    predictions = euler_step(sources, x, keys)
+
     loss = loss_fn(predictions, y)/dt
     optimizer.zero_grad()
     loss.backward()
@@ -134,18 +127,26 @@ def train_and_store_loss(engine, batch):
     return loss.item()
 
 
-def train_and_store_loss_attacked(engine, batch):
+def train_and_store_attacked(engine, batch):
     x, y = batch
-    # x = _add_null_dims(x)
-    # y = _add_null_dims(y)
-    predictions = stepper(x)
-    loss = loss_fn(predictions, y)/dt
+    x = _add_null_dims(x)
+    y = _add_null_dims(y)
+
+    keys = ['QT', 'SLI']
+    scaled = model.scaler(x)
+
     optimizer.zero_grad()
-    loss.backward()
+
+    def closure(scaled):
+        sources = model(scaled)
+        predictions = euler_step(sources, x, keys)
+        loss = loss_fn(predictions, y)/dt
+        loss.backward()
+        return loss
+
+    loss = closure(scaled)
     optimizer.step()
     return loss.item()
-
-
 
 def test_train_loader():
     train_loader = get_data_loader(data)
@@ -154,7 +155,7 @@ def test_train_loader():
 
     train_and_store_loss(None, (x, y))
 
-trainer = Engine(train_and_store_loss)
+trainer = Engine(train_and_store_attacked)
 
 # trainer = create_supervised_trainer(stepper, optimizer, loss_fn)
 
