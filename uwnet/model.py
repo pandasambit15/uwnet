@@ -256,8 +256,7 @@ class ApparentSource(nn.Module):
         All inputs have shape (*, z, y, x) or (*, y, x)
 
         """
-        scaled = self.scaler(x)
-        return self.forward_with_scaled(scaled)
+        return self.forward_with_scaled(x)
 
     def forward_with_scaled(self, scaled):
         reshaped_inputs = _height_to_last_dim(scaled, input_specs=self.inputs)
@@ -267,6 +266,7 @@ class ApparentSource(nn.Module):
     def call_with_xr(self, ds, **kwargs):
         """Call the neural network with xarray inputs"""
         tensordict = _dataset_to_torch_dict(ds)
+        tensordict = self.scaler(tensordict)
         with torch.no_grad():
             output = self(tensordict, **kwargs)
         return _torch_dict_to_dataset(output, ds.coords)

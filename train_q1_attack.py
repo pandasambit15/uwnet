@@ -110,7 +110,8 @@ class EulerStep(nn.Module):
     def forward(self, x):
         # x = _add_null_dims(x)
         prediction = {}
-        sources = self.model(x)
+        scaled = self.model.scaler(x)
+        sources = self.model(scaled)
         for key in self.keys:
             state = x[key]
             forcing_key = 'F' + key
@@ -197,7 +198,7 @@ def log_training_results(engine):
 
 
 
-trainer.run(train_loader, max_epochs=4)
+trainer.run(train_loader, max_epochs=1)
 pbar.close()
 
 # engine.run(Dumb())
