@@ -1,5 +1,6 @@
 import xarray as xr
 from uwnet.model import ApparentSource
+from uwnet.attacks import attacked_loss_and_gradients
 from uwnet.datasets import _ds_slice_to_torch, XarrayPoints
 from toolz import curry
 import torch
@@ -107,14 +108,14 @@ class EulerStep(nn.Module):
         self.dt = dt
 
     def forward(self, x):
-        x = _add_null_dims(x)
+        # x = _add_null_dims(x)
         prediction = {}
         sources = self.model(x)
         for key in self.keys:
             state = x[key]
             forcing_key = 'F' + key
             prediction[key] = state + dt * sources[key] + dt * 86400 * x[forcing_key]
-        return _remove_null_dims(prediction)
+        return prediction
 
 
 stepper = EulerStep(model, ['QT', 'SLI'], dt)
@@ -126,6 +127,19 @@ def train_and_store_loss(engine, batch):
 
     predictions = stepper(x)
     loss = loss_fn(predictions, y)/dt
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    return loss.item()
+
+
+def train_and_store_loss_attacked(engine, batch):
+    x, y = batch
+    # x = _add_null_dims(x)
+    # y = _add_null_dims(y)
+    predictions = stepper(x)
+    loss = loss_fn(predictions, y)/dt
+    optimizer.zero_grad()
     loss.backward()
     optimizer.step()
     return loss.item()
@@ -139,8 +153,9 @@ def test_train_loader():
 
     train_and_store_loss(None, (x, y))
 
+trainer = Engine(train_and_store_loss)
 
-trainer = create_supervised_trainer(stepper, optimizer, loss_fn)
+# trainer = create_supervised_trainer(stepper, optimizer, loss_fn)
 
 
 desc = "ITERATION - loss: {:.2f}"
