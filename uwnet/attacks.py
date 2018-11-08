@@ -19,6 +19,7 @@ def gradient_attack(inputs, eps):
     for key, val in inputs.items():
         norm = torch.norm(val) / val.numel()
         norm_grad = val.grad * (eps / norm)
+        norm_grad = torch.sign(val.grad) * eps
         attacked = val + norm_grad
         attacked = attacked.detach()
         attacked.requires_grad = True

@@ -134,17 +134,16 @@ def train_and_store_attacked(engine, batch):
 
     keys = ['QT', 'SLI']
     scaled = model.scaler(x)
-
+    scaled = {key: scaled[key] for key in model.inputs.names}
     optimizer.zero_grad()
 
     def closure(scaled):
         sources = model(scaled)
         predictions = euler_step(sources, x, keys)
         loss = loss_fn(predictions, y)/dt
-        loss.backward()
         return loss
 
-    loss = closure(scaled)
+    loss = attacked_loss_and_gradients(closure, scaled, eps=1.0, alpha=2.0)
     optimizer.step()
     return loss.item()
 
