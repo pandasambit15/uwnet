@@ -256,9 +256,12 @@ class ApparentSource(nn.Module):
         All inputs have shape (*, z, y, x) or (*, y, x)
 
         """
-        reshaped_inputs = _height_to_last_dim(x, input_specs=self.inputs)
-        scaled = self.scaler(reshaped_inputs)
-        out = self.model(scaled)
+        scaled = self.scaler(x)
+        return self.forward_with_scaled(scaled)
+
+    def forward_with_scaled(self, scaled):
+        reshaped_inputs = _height_to_last_dim(scaled, input_specs=self.inputs)
+        out = self.model(reshaped_inputs)
         return _height_to_original_dim(out, self.outputs)
 
     def call_with_xr(self, ds, **kwargs):

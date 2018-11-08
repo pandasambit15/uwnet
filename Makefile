@@ -60,8 +60,8 @@ ${TRAINING_DATA}:
 	snakemake data/processed/training.nc
 
 train: ${TRAINING_DATA}
-	python -m uwnet.train with data=data/processed/training.nc examples/SAM.yaml 'x=(0,128,8)' skip=10 seq_length=10 batch_size=128 lr=.005 n_epochs=20 -m uwnet
-
+	python -m uwnet.train with data=data/processed/training.nc 'x=(0,128,8)' skip=1 seq_length=1 batch_size=128 lr=.005 'y=(32,33)'
+ 
 train_momentum: ${TRAINING_DATA}
 	python -m uwnet.train with data=${TRAINING_DATA} examples/momentum.yaml
 

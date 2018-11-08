@@ -1,6 +1,16 @@
 import torch
 from toolz import curry
-from .timestepper import Batch, predict_multiple_steps
+from torch import nn
+from .timestepper import Batch, predict_multiple_steps, step_with_batch
+from .attacks import attacked_loss_and_gradients
+
+
+@curry
+def dictloss(criterion, keys, truth, prediction):
+    loss = 0.0
+    for key in keys:
+        loss += criterion(truth[key], prediction[key])
+    return loss
 
 
 def weighted_mean_squared_error(truth, prediction, weights, dim=-1):
@@ -27,6 +37,19 @@ def weighted_mean_squared_error(truth, prediction, weights, dim=-1):
 
     # weight over the remaining dimension and sum
     return torch.mean(error2 * weights)
+
+
+def adverserial_one_step_loss(alpha, eps, model, prognostics, time_step, batch,
+                              time):
+    def closure(scaled):
+        batch = Batch(scaled, prognostics)
+        pred = step_with_batch(model.forward_with_scaled, time_step, batch,
+                               time)
+        truth = batch.get_prognostics_at_time(time + 1)
+        return dictloss(nn.MSMSELoss(), prognostics, truth, pred)
+
+    scaled = model.scaler(batch)
+    return attacked_loss_and_gradients(closure, scaled, eps, alpha)
 
 
 def mse(x, y, layer_mass):

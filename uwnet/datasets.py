@@ -46,13 +46,10 @@ class XarrayPoints(Dataset):
         self.data_vars = set(data.data_vars)
         self.batch_dims = batch_dims
         self.dims = {key: data[key].dims for key in data.data_vars}
+        self.batch_shape = [len(self.data[dim]) for dim in self.batch_dims]
 
     def __len__(self):
         return np.prod(self.batch_shape)
-
-    @property
-    def batch_shape(self):
-        return [len(self.data[dim]) for dim in self.batch_dims]
 
     def __getitem__(self, i):
 
