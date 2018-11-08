@@ -12,6 +12,12 @@ def _scale_var(scale, mean, x):
     mu = mean.double()
     sig = scale.double()
 
+    if sig.numel() == 1:
+        sig = sig.squeeze()
+
+    if mu.numel() == 1:
+        mu = mu.squeeze()
+
     x = x.sub(mu)
     x = x.div(sig + 1e-7)
 

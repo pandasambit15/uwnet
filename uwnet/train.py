@@ -54,7 +54,8 @@ def get_dataset(data):
 
 
 def water_budget_plots(model, ds, location, filenames):
-    scm_data = single_column_simulation(model, location, interval=(0, 190))
+    nt = min(190, len(ds.time)-1)
+    scm_data = single_column_simulation(model, location, interval=(0, nt))
     merged_pred_data = location.rename({
         'SLI': 'SLIOBS',
         'QT': 'QTOBS'
@@ -185,6 +186,22 @@ def get_model_inputs_from_batch(batch):
     return valmap(redimension_torch_loader_output, batch)
 
 
+def _ds_slice_to_torch(x):
+    return {key: torch.tensor(val.values).view(-1, 1, 1) for key, val in x.items()}
+
+
+def get_mean_sig(data):
+    avg_dims = ['x', 'y', 'time']
+    mean = data.mean(avg_dims)
+    sig = data.std(avg_dims)
+    sig = sig.where(sig > 1e-6, 1e-6)
+
+    mean = _ds_slice_to_torch(mean)
+    sig = _ds_slice_to_torch(sig)
+
+    return mean, sig
+
+
 class Trainer(object):
     """Utility object for training a neural network parametrization
 
@@ -241,12 +258,8 @@ class Trainer(object):
         self.constants = train_data.torch_constants()
 
         # compute standard deviation
-        self.logger.info("Computing Standard Deviation")
-        scale = train_data.scale
-
-        # compute scaler
-        self.logger.info("Computing Mean")
-        mean = train_data.mean
+        self.logger.info("Computing Mean and scale")
+        mean, scale = get_mean_sig(ds)
 
         input_fields = (('QT', vertical_grid_size),
                         ('SLI', vertical_grid_size), ('SST', 1), ('SOLIN', 1))

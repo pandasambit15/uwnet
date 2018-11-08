@@ -26,3 +26,14 @@ def test_LinearDictOut():
         assert out[key].size(-1) == num
 
     out['A'][0, 0].backward()
+
+
+def test_LinearDictOut_shape():
+    n_out = 10
+    n_in = 4
+    outputs = [('A', n_out)]
+
+    input = torch.zeros(128, 1, n_in)
+    lin = LinearDictOut(n_in, outputs)
+    out = lin(input)
+    assert out['A'].shape == (128, 1, n_out)

@@ -40,14 +40,6 @@ def predict_one_step(prognostics, apparent_source, forcing, time_step):
     return prediction
 
 
-def step_with_batch(model, time_step, batch, time):
-    state = batch.get_prognostics_at_time(time)
-    inputs = batch.get_model_inputs(time, state)
-    apparent_sources = model(inputs)
-    known_forcing = batch.get_known_forcings_at_time(time)
-    return predict_one_step(state, apparent_sources, known_forcing, time_step)
-
-
 def predict_multiple_steps(model, batch: Batch, initial_time,
                            prediction_length, time_step):
     """Yield Euler step predictions with a neural network"""

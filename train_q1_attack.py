@@ -1,6 +1,7 @@
 import xarray as xr
 from uwnet.model import ApparentSource
 from uwnet.attacks import attacked_loss_and_gradients
+from uwnet.train import water_budget_plots
 from uwnet.datasets import _ds_slice_to_torch, XarrayPoints
 from toolz import curry
 import torch
@@ -40,7 +41,7 @@ def _ds_slice_to_torch(x):
 def get_mean_sig(data):
     avg_dims = ['x', 'y', 'time']
     mean = data.mean(avg_dims)
-    sig = data.std(avg_dims)
+    sig = data.quantile(.99, avg_dims)
     sig = sig.where(sig > 1e-6, 1e-6)
 
     mean = _ds_slice_to_torch(mean)
@@ -59,9 +60,9 @@ def get_model(data):
     return ApparentSource(mean, sig, inputs=input_fields,
                           outputs=output_fields)
 
+fields = ['QT', 'SLI', 'FQT', 'FSLI', 'SST', 'SOLIN']
 
-def get_data_loader(data, batch_size=128):
-    fields = ['QT', 'SLI', 'FQT', 'FSLI', 'SST', 'SOLIN']
+def get_data_loader(data, batch_size=32):
     progs = ['QT', 'SLI']
 
     data = data.load()
@@ -83,7 +84,7 @@ dt = .125
 data = xr.open_dataset(data_path).isel(step=0, y=slice(32, 33)).load()
 model = get_model(data)
 train_loader = get_data_loader(data)
-optimizer = torch.optim.Adam(model.parameters(), lr=.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=.01, weight_decay=.001)
 loss_fn = dictloss(nn.MSELoss(), ['QT', 'SLI'])
 
 
@@ -106,7 +107,31 @@ def euler_step(sources, states, keys):
         state = states[key]
         forcing_key = 'F' + key
         known_forcing = states[forcing_key]
-        prediction[key] = state + dt * sources[key] + dt * 86400 * known_forcing
+        prediction[key] = state + dt  * sources[key] + dt * 86400 * known_forcing
+    return prediction
+
+
+def trap_step(f, states, keys):
+    prediction = {}
+    midpoint = {}
+
+    sources = f(states)
+    for key in keys:
+        state = states[key]
+        forcing_key = 'F' + key
+        known_forcing = states[forcing_key]
+        pred  = state + dt  * sources[key] + dt * 86400 * known_forcing
+        midpoint[key] = (pred + state)/2
+
+    for key in states:
+        if key not in keys:
+            midpoint[key] = states[key]
+    sources = f(midpoint)
+    for key in keys:
+        state = states[key]
+        forcing_key = 'F' + key
+        known_forcing = states[forcing_key]
+        prediction[key] = state + dt  * sources[key] + dt * 86400 * known_forcing
     return prediction
 
 
@@ -116,9 +141,11 @@ def train_and_store_loss(engine, batch):
     y = _add_null_dims(y)
 
     keys = ['QT', 'SLI']
-    scaled = model.scaler(x)
-    sources = model(scaled)
-    predictions = euler_step(sources, x, keys)
+
+    def f(x):
+        return model(model.scaler(x))
+
+    predictions = trap_step(f, x, keys)
 
     loss = loss_fn(predictions, y)/dt
     optimizer.zero_grad()
@@ -143,7 +170,7 @@ def train_and_store_attacked(engine, batch):
         loss = loss_fn(predictions, y)/dt
         return loss
 
-    loss = attacked_loss_and_gradients(closure, scaled, eps=1.0, alpha=2.0)
+    loss = attacked_loss_and_gradients(closure, scaled, eps=1.0, alpha=1.0)
     optimizer.step()
     return loss.item()
 
@@ -155,6 +182,7 @@ def test_train_loader():
     train_and_store_loss(None, (x, y))
 
 trainer = Engine(train_and_store_attacked)
+trainer = Engine(train_and_store_loss)
 
 # trainer = create_supervised_trainer(stepper, optimizer, loss_fn)
 
@@ -175,6 +203,20 @@ def log_training_loss(engine):
         pbar.update(log_interval)
 
 
+def make_plots(epoch):
+    output = model.call_with_xr(data.isel(x=slice(0,1)))
+    plt.figure()
+    output.QT.plot(x='time')
+    plt.xlim([100, 120])
+    plt.savefig(f"{epoch}.png")
+    plt.close()
+
+    filenames  = [f"{epoch}.{plot}.png"
+            for plot in ['qt', 'fqtnn', 'fqtn-pred', 'water']]
+    names = model.inputs.names + ['FQT', 'FSLI']
+    location = data[names].isel(x=slice(0,1))
+    water_budget_plots(model, data, location, filenames)
+
 @trainer.on(Events.EPOCH_COMPLETED)
 def log_training_results(engine):
     pbar.refresh()
@@ -182,12 +224,7 @@ def log_training_results(engine):
     # metrics = evaluator.state.metrics
     # avg_accuracy = metrics['accuracy']
     # avg_nll = metrics['nll']
-    output = model.call_with_xr(data.isel(x=slice(0,1)))
-    plt.figure()
-    output.QT.plot(x='time')
-    plt.xlim([100, 120])
-    plt.savefig(f"{engine.state.epoch}.png")
-    plt.close()
+    make_plots(engine.state.epoch)
 
     tqdm.write(
         "Training Results - Epoch: {} "
@@ -196,9 +233,9 @@ def log_training_results(engine):
     pbar.n = pbar.last_print_n = 0
 
 
+#make_plots(epoch=1)
 
-
-trainer.run(train_loader, max_epochs=1)
+trainer.run(train_loader, max_epochs=3)
 pbar.close()
 
 # engine.run(Dumb())

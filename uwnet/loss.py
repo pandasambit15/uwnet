@@ -1,7 +1,7 @@
 import torch
 from toolz import curry
 from torch import nn
-from .timestepper import Batch, predict_multiple_steps, step_with_batch
+from .timestepper import Batch, predict_multiple_steps
 from .attacks import attacked_loss_and_gradients
 
 
