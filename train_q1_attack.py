@@ -8,6 +8,8 @@ from tqdm import tqdm
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 from uwnet.loss import dictloss
 from ignite.engine import Engine, Events, create_supervised_trainer
+import matplotlib.pyplot as plt
+plt.ion()
 
 
 class TupleDataset(Dataset):
@@ -156,6 +158,7 @@ def log_training_loss(engine):
         pbar.desc = desc.format(engine.state.output)
         pbar.update(log_interval)
 
+
 @trainer.on(Events.EPOCH_COMPLETED)
 def log_training_results(engine):
     pbar.refresh()
@@ -163,6 +166,13 @@ def log_training_results(engine):
     # metrics = evaluator.state.metrics
     # avg_accuracy = metrics['accuracy']
     # avg_nll = metrics['nll']
+    output = model.call_with_xr(data.isel(x=slice(0,1)))
+    plt.figure()
+    output.QT.plot(x='time')
+    plt.xlim([100, 120])
+    plt.savefig(f"{engine.state.epoch}.png")
+    plt.close()
+
     tqdm.write(
         "Training Results - Epoch: {} "
         .format(engine.state.epoch)
