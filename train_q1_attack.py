@@ -84,7 +84,7 @@ dt = .125
 data = xr.open_dataset(data_path).isel(step=0, y=slice(32, 33)).load()
 model = get_model(data)
 train_loader = get_data_loader(data)
-optimizer = torch.optim.Adam(model.parameters(), lr=.01, weight_decay=.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=.01, weight_decay=.01)
 loss_fn = dictloss(nn.MSELoss(), ['QT', 'SLI'])
 
 
@@ -101,13 +101,16 @@ def _remove_null_dims(x):
     return {key: _(val) for key, val in x.items()}
 
 
-def euler_step(sources, states, keys):
+def euler_step(f, states, keys):
     prediction = {}
+    sources = f(states)
     for key in keys:
         state = states[key]
         forcing_key = 'F' + key
         known_forcing = states[forcing_key]
-        prediction[key] = state + dt  * sources[key] + dt * 86400 * known_forcing
+        pred = state + dt * sources[key] + dt * 86400 * known_forcing
+        prediction[key] = pred
+
     return prediction
 
 
@@ -145,7 +148,7 @@ def train_and_store_loss(engine, batch):
     def f(x):
         return model(model.scaler(x))
 
-    predictions = trap_step(f, x, keys)
+    predictions = euler_step(f, x, keys)
 
     loss = loss_fn(predictions, y)/dt
     optimizer.zero_grad()
