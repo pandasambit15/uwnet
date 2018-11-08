@@ -9,6 +9,7 @@ from torch import nn
 from tqdm import tqdm
 from torch.utils.data import ConcatDataset, DataLoader, Dataset
 from uwnet.loss import dictloss
+from uwnet.tensordict import TensorDict
 from ignite.engine import Engine, Events, create_supervised_trainer
 import matplotlib.pyplot as plt
 plt.ion()
@@ -92,26 +93,28 @@ loss_fn = dictloss(nn.MSELoss(), ['QT', 'SLI'])
 def _add_null_dims(x):
     def _(x):
         return x.unsqueeze(-1).unsqueeze(-1)
-    return {key: _(val) for key, val in x.items()}
+    return TensorDict(x).apply(_)
 
 
 def _remove_null_dims(x):
     def _(x):
         return x.squeeze(-1).squeeze(-1)
-    return {key: _(val) for key, val in x.items()}
+    return TensorDict(x).apply(_)
+
+
+def get_forcings(states, keys):
+    known_forcing = {}
+    for key in keys:
+        forcing_key = 'F' + key
+        known_forcing[key] = states[forcing_key]
+    return TensorDict(known_forcing)
 
 
 def euler_step(f, states, keys):
-    prediction = {}
     sources = f(states)
-    for key in keys:
-        state = states[key]
-        forcing_key = 'F' + key
-        known_forcing = states[forcing_key]
-        pred = state + dt * sources[key] + dt * 86400 * known_forcing
-        prediction[key] = pred
-
-    return prediction
+    forcing = get_forcings(states, keys)
+    state = states[keys]
+    return state + dt * sources + dt * 86400 * forcing
 
 
 def trap_step(f, states, keys):
