@@ -251,6 +251,18 @@ y : prediction</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="uwnet.loss.mean_other_dims">
+<code class="descclassname">uwnet.loss.</code><code class="descname">mean_other_dims</code><span class="sig-paren">(</span><em>x</em>, <em>dim</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.mean_other_dims" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a mean over all dimensions but the one specified</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.loss.mean_over_dims">
+<code class="descclassname">uwnet.loss.</code><code class="descname">mean_over_dims</code><span class="sig-paren">(</span><em>x</em>, <em>dims</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.mean_over_dims" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a mean over a list of dimensions keeping the as singletons</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="uwnet.loss.weighted_mean_squared_error">
 <code class="descclassname">uwnet.loss.</code><code class="descname">weighted_mean_squared_error</code><span class="sig-paren">(</span><em>truth</em>, <em>prediction</em>, <em>weights</em>, <em>dim=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.weighted_mean_squared_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the weighted mean squared error</p>
@@ -264,6 +276,12 @@ and prediction arrays along the dimension <cite>dim</cite></div></blockquote>
 <dt>dim:</dt>
 <dd>the dimension the data should be weighted along</dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.loss.weighted_r2_score">
+<code class="descclassname">uwnet.loss.</code><code class="descname">weighted_r2_score</code><span class="sig-paren">(</span><em>truth</em>, <em>prediction</em>, <em>weights</em>, <em>dim=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.weighted_r2_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the weighted R2 score</p>
 </dd></dl>
 
 </div>
