@@ -88,11 +88,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Training Procedure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#mini-batches">Mini-batches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#loss-function">Loss Function</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sequence-prediction">Sequence Prediction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-uwnet.train">Script</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#stabilizing-a-neural-network">Stabilizing a neural network</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="constraints.html">Physical constraints</a></li>
@@ -154,7 +150,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/training.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/training.md.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -168,40 +164,54 @@
            <div itemprop="articleBody">
             
   <div class="section" id="training-procedure">
-<h1>Training Procedure<a class="headerlink" href="#training-procedure" title="Permalink to this headline">¶</a></h1>
+<span id="training-procedure"></span><h1>Training Procedure<a class="headerlink" href="#training-procedure" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="mini-batches">
-<h2>Mini-batches<a class="headerlink" href="#mini-batches" title="Permalink to this headline">¶</a></h2>
-<p>A mini-batch is a collection of time series drawn from random <span class="math notranslate nohighlight">\((x,y)\)</span>
+<span id="mini-batches"></span><h2>Mini-batches<a class="headerlink" href="#mini-batches" title="Permalink to this headline">¶</a></h2>
+<p>A mini-batch is a collection of time series drawn from random <span class="math notranslate">\( (x,y) \)</span>
 locations.</p>
 </div>
 <div class="section" id="loss-function">
-<h2>Loss Function<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h2>
+<span id="loss-function"></span><h2>Loss Function<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h2>
 <p>We use a mass-weighted loss function for 3D variables and a non-mass-weighted one for two dimensional one.</p>
 <p>Comparing variables that are two-dimensional with one-dimensional ones requires a little attention. One way to equally weight two dimensional variables in the loss function is to put all variables into energy or power units.</p>
 </div>
-<div class="section" id="sequence-prediction">
-<h2>Sequence Prediction<a class="headerlink" href="#sequence-prediction" title="Permalink to this headline">¶</a></h2>
-<p>The neural network is trained to produce good predictions over multiple time
-steps.</p>
-</div>
-<div class="section" id="module-uwnet.train">
-<span id="script"></span><h2>Script<a class="headerlink" href="#module-uwnet.train" title="Permalink to this headline">¶</a></h2>
-<p>Train neural network parametrizations using the single or
-multiple step loss function</p>
-<p>This code uses a tool called <a class="reference external" href="https://github.com/IDSIA/sacred">Sacred</a> to log important details about each
-execution of this script to a database, and to specify hyper parameters of the
-scheme (e.g. learning rate).</p>
-<div class="section" id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
-<p>This script can be executed with the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">train</span> <span class="k">with</span> <span class="n">data</span><span class="o">=&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">dataset</span><span class="o">&gt;</span>
-</pre></div>
-</div>
-<p>To see a list of all the available configuration options run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">uwnet</span><span class="o">.</span><span class="n">train</span> <span class="n">print_config</span>
-</pre></div>
-</div>
-</div>
+<div class="section" id="stabilizing-a-neural-network">
+<span id="stabilizing-a-neural-network"></span><h2>Stabilizing a neural network<a class="headerlink" href="#stabilizing-a-neural-network" title="Permalink to this headline">¶</a></h2>
+<p>There is no guarrantee that a neural network which can predict <span class="math notranslate">\( Q_1 \)</span> and
+<span class="math notranslate">\( Q_2 \)</span> will be stable when evaluated over many time steps. In fact it is
+almost always not stable, and this lack of stability manifests as an exponential
+growth in the underyling fields. This is likely due to the jacobian of the
+learned neural network having eigenvalues that lie outside the stability region
+of the explicit Euler time stepper we are using to train.</p>
+<p>In previous work, we found that training the neural network to produce good
+predictions over a sufficient interval in time stabilized the network.
+Unfortunately, this approach also produced biased estimate of the apparent
+sources. This bias occurs because there is a substantial statisticla difference
+between the observed and predicted trajectories starting at a given time point.
+This in turn, is likely caused by assuming that the integral of known forcing
+<span class="math notranslate">\( g \)</span> in time can be approximate by its starting value <span class="math notranslate">\( g(t^n) \)</span>. While
+this estimate itself might not be biased, when integrated into a non-linear time
+stepper it can be.</p>
+<p>A simpler strategy, which also achieves numerical stability of the known time
+stepper is to directly penalize the unrealistic growth of the system under a
+constant forcing. This removes the issues with bias. Therefore the penalized loss is <span class="math notranslate">\( J(f) = J_1(f) + \lambda J_2(f) \)</span>. The first loss is the error using the trapezoid rule to evaluate the change in the state:
+\begin{align}
+J_1(f) &amp;= E_n \left| x^{n+1} - \left[ x^{n} + h \frac{g^n + g^{n+1} + f(x^n) + f(x^{n+1})}{2}\right]\right|^2 .
+\end{align}
+To define the second loss, we introduce an operator which performs an Euler Step with the time-mean forcing for a given location <span class="math notranslate">\(i\)</span>:
+\begin{align}
+\psi_{i,h} x = x + h \left[ \bar{g}_i + f(x) \right].
+\end{align}
+Here, <span class="math notranslate">\(\bar{g}_i\)</span> is the time mean of the forcing for a location <span class="math notranslate">\(i\)</span>. Then, the mean-decay penalty term is defined as</p>
+<p>\begin{align}
+J_2(f; m, h) = E_{i,n} \left| \bar{x_i} - \psi_{i,h}^m x_i^n \right|^2
+\end{align}</p>
+<p>This expression demands that the learned dynamics approach the equilibrium state
+under the time-mean forcings, regardless of the initial conditions. Unlike the
+multiple time step loss, this simple equilibrium consistency constraint only
+requires that the time-mean of the forcings is estimated well, rather than
+demanding that time stepper works well.</p>
+<p>In practice, <span class="math notranslate">\( J_1(f) \)</span> is computed for every time and spatial location in a batch, but we only compute <span class="math notranslate">\( J_2(f) \)</span> for a single randomly chosen starting time point <span class="math notranslate">\( n \)</span>. In practice, this is enough to penalize the unstable modes of the neural network time stepper.</p>
 </div>
 </div>
 
@@ -246,12 +256,21 @@ scheme (e.g. learning rate).</p>
 
     
     
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/HTML-CSS"]})</script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   
