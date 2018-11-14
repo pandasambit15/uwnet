@@ -226,18 +226,6 @@ that the axes of the data arrays are all stored in that order.</p>
 </div>
 <div class="section" id="module-uwnet.loss">
 <span id="loss-functions"></span><h2>Loss Functions<a class="headerlink" href="#module-uwnet.loss" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="uwnet.loss.MVLoss">
-<code class="descclassname">uwnet.loss.</code><code class="descname">MVLoss</code><a class="headerlink" href="#uwnet.loss.MVLoss" title="Permalink to this definition">¶</a></dt>
-<dd><p>MSE loss</p>
-<dl class="docutils">
-<dt>keys</dt>
-<dd>list of keys to compute loss with</dd>
-</dl>
-<p>x : truth
-y : prediction</p>
-</dd></dl>
-
 <dl class="function">
 <dt id="uwnet.loss.compute_multiple_step_loss">
 <code class="descclassname">uwnet.loss.</code><code class="descname">compute_multiple_step_loss</code><span class="sig-paren">(</span><em>criterion</em>, <em>model</em>, <em>batch</em>, <em>prognostics</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.compute_multiple_step_loss" title="Permalink to this definition">¶</a></dt>
@@ -295,7 +283,7 @@ and prediction arrays along the dimension <cite>dim</cite></div></blockquote>
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="uwnet.model.ApparentSource">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ApparentSource</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>inputs=(('LHF'</em>, <em>1)</em>, <em>('SHF'</em>, <em>1)</em>, <em>('SOLIN'</em>, <em>1)</em>, <em>('QT'</em>, <em>34)</em>, <em>('SLI'</em>, <em>34)</em>, <em>('FQT'</em>, <em>34)</em>, <em>('FSLI'</em>, <em>34))</em>, <em>outputs=(('SLI'</em>, <em>34)</em>, <em>('QT'</em>, <em>34))</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ApparentSource</code><span class="sig-paren">(</span><em>model</em>, <em>inputs=()</em>, <em>outputs=()</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>PyTorch module for predicting Q1, Q2 and maybe Q3</p>
 <dl class="method">
 <dt id="uwnet.model.ApparentSource.call_with_xr">
@@ -313,24 +301,21 @@ and prediction arrays along the dimension <cite>dim</cite></div></blockquote>
 </dd></dl>
 
 <dl class="class">
-<dt id="uwnet.model.ForcedStepper">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ForcedStepper</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>time_step</em>, <em>auxiliary=()</em>, <em>prognostic=()</em>, <em>diagnostic=()</em>, <em>forcing=()</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ForcedStepper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Single Column Model Stepper</p>
-<p>Integrates the single column equations with the trapezoid rule:</p>
-<blockquote>
-<div>x_n+1 = x_n + f(x_n) dt + (g(t_n) + g(t_n+1)) dt / 2</div></blockquote>
+<dt id="uwnet.model.InnerModel">
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">InnerModel</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>inputs</em>, <em>outputs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.InnerModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inner model which operates with height along the last dimension</p>
 <dl class="method">
-<dt id="uwnet.model.ForcedStepper.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em>, <em>n=None</em>, <em>n_prog=None</em>, <em>dt=None</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ForcedStepper.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produce an n-step prediction for single column mode</p>
-<dl class="docutils">
-<dt>x <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd>a dict of torch tensors containing all the keys in the prognostic, diagnostic, and forcing attributes</dd>
-<dt>n <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>the number of time steps to produce a prediction for</dd>
-<dt>n_prog <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>the number of burn-in-steps. The prediction only begins after n_prog steps.</dd>
-</dl>
+<dt id="uwnet.model.InnerModel.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.InnerModel.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -394,6 +379,12 @@ dimension, and name.</p>
 <dt id="uwnet.model.call_with_xr">
 <code class="descclassname">uwnet.model.</code><code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>self</em>, <em>ds</em>, <em>drop_times=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.call_with_xr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call the neural network with xarray inputs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.model.get_model">
+<code class="descclassname">uwnet.model.</code><code class="descname">get_model</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>vertical_grid_size</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an MLP with scaled inputs and outputs</p>
 </dd></dl>
 
 </div>
