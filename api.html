@@ -169,7 +169,7 @@
 <span id="datasets"></span><h2>Datasets<a class="headerlink" href="#module-uwnet.datasets" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="uwnet.datasets.XRTimeSeries">
-<em class="property">class </em><code class="descclassname">uwnet.datasets.</code><code class="descname">XRTimeSeries</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.datasets.</code><code class="descname">XRTimeSeries</code><span class="sig-paren">(</span><em>data</em>, <em>time_length=None</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pytorch Dataset class for time series data in xarray format</p>
 <p>This function assumes the data has dimensions [‘time’, ‘z’, ‘y’, ‘x’], and
 that the axes of the data arrays are all stored in that order.</p>
@@ -198,6 +198,11 @@ that the axes of the data arrays are all stored in that order.</p>
 <dl class="attribute">
 <dt id="uwnet.datasets.XRTimeSeries.scale">
 <code class="descname">scale</code><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="uwnet.datasets.XRTimeSeries.setup_indices">
+<code class="descname">setup_indices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.setup_indices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
