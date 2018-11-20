@@ -244,12 +244,6 @@ that the axes of the data arrays are all stored in that order.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="uwnet.loss.loss_with_equilibrium_penalty">
-<code class="descclassname">uwnet.loss.</code><code class="descname">loss_with_equilibrium_penalty</code><span class="sig-paren">(</span><em>criterion</em>, <em>model</em>, <em>batch</em>, <em>prognostics=()</em>, <em>time_step=0.125</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.loss_with_equilibrium_penalty" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the loss across multiple time steps with an Euler stepper</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="uwnet.loss.mean_other_dims">
 <code class="descclassname">uwnet.loss.</code><code class="descname">mean_other_dims</code><span class="sig-paren">(</span><em>x</em>, <em>dim</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.mean_other_dims" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a mean over all dimensions but the one specified</p>
@@ -259,6 +253,12 @@ that the axes of the data arrays are all stored in that order.</p>
 <dt id="uwnet.loss.mean_over_dims">
 <code class="descclassname">uwnet.loss.</code><code class="descname">mean_over_dims</code><span class="sig-paren">(</span><em>x</em>, <em>dims</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.mean_over_dims" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a mean over a list of dimensions keeping the as singletons</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.loss.total_loss">
+<code class="descclassname">uwnet.loss.</code><code class="descname">total_loss</code><span class="sig-paren">(</span><em>criterion</em>, <em>model</em>, <em>z</em>, <em>batch</em>, <em>time_step=0.125</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.loss.total_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the loss across multiple time steps with an Euler stepper</p>
 </dd></dl>
 
 <dl class="attribute">
