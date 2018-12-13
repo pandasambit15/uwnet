@@ -436,6 +436,45 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="uwnet.modules.LinearFixed">
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearFixed</code><span class="sig-paren">(</span><em>weight</em>, <em>bias</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed" title="Permalink to this definition">¶</a></dt>
+<dd><p>A linear tranform with fixed weights and bias</p>
+<p>Useful for representing scikit-learn affine transform functions</p>
+<dl class="method">
+<dt id="uwnet.modules.LinearFixed.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x: &lt;built-in method tensor of type object at 0x2b9dbe1efe80&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="uwnet.modules.LinearFixed.from_affine">
+<em class="property">classmethod </em><code class="descname">from_affine</code><span class="sig-paren">(</span><em>func</em>, <em>n</em>, <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.from_affine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize from an arbitrary python function</p>
+<dl class="docutils">
+<dt>func</dt>
+<dd>function has input dimension n and output dimension m</dd>
+<dt>n, m <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>input and output dimensions</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="uwnet.modules.get_affine_transforms">
+<code class="descclassname">uwnet.modules.</code><code class="descname">get_affine_transforms</code><span class="sig-paren">(</span><em>func</em>, <em>n</em>, <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.get_affine_transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get weights matrix and bias of an affine function</p>
+</dd></dl>
+
 </div>
 </div>
 
