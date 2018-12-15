@@ -173,17 +173,14 @@
 <dd><p>A pytorch Dataset class for time series data in xarray format</p>
 <p>This function assumes the data has dimensions [‘time’, ‘z’, ‘y’, ‘x’], and
 that the axes of the data arrays are all stored in that order.</p>
-<p>data : xr.Dataset</p>
+<p>An individual “sample” is the full time time series from a single
+horizontal location. The time-varying variables in this sample will have
+shape (time, z, 1, 1).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s2">&quot;in.nc&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">XRTimeSeries</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
-<dl class="attribute">
-<dt id="uwnet.datasets.XRTimeSeries.batch_dims">
-<code class="descname">batch_dims</code><em class="property"> = ['y', 'x']</em><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.batch_dims" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="attribute">
 <dt id="uwnet.datasets.XRTimeSeries.dims">
 <code class="descname">dims</code><em class="property"> = ['time', 'z', 'x', 'y']</em><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.dims" title="Permalink to this definition">¶</a></dt>
@@ -287,25 +284,6 @@ and prediction arrays along the dimension <cite>dim</cite></div></blockquote>
 <div class="section" id="module-uwnet.model">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="uwnet.model.ApparentSource">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">ApparentSource</code><span class="sig-paren">(</span><em>model</em>, <em>inputs=()</em>, <em>outputs=()</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource" title="Permalink to this definition">¶</a></dt>
-<dd><p>PyTorch module for predicting Q1, Q2 and maybe Q3</p>
-<dl class="method">
-<dt id="uwnet.model.ApparentSource.call_with_xr">
-<code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>ds</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource.call_with_xr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call the neural network with xarray inputs</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="uwnet.model.ApparentSource.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.ApparentSource.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Estimated source terms and diagnostics</p>
-<p>All inputs have shape (<em>, z, y, x) or (</em>, y, x)</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="uwnet.model.InnerModel">
 <em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">InnerModel</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>inputs</em>, <em>outputs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.InnerModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inner model which operates with height along the last dimension</p>
@@ -325,67 +303,6 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="uwnet.model.MOE">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">MOE</code><span class="sig-paren">(</span><em>m</em>, <em>n</em>, <em>n_experts</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MOE" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="uwnet.model.MOE.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.MOE.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="uwnet.model.SaverMixin">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">SaverMixin</code><a class="headerlink" href="#uwnet.model.SaverMixin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mixin for output and initializing models from dictionaries of the state
-and arguments</p>
-<p>args
-kwargs</p>
-<p>To easily get this to work with a new class add these lines at the top of
-the __init__ method:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;self&#39;</span><span class="p">)</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__class__&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="class">
-<dt id="uwnet.model.VariableList">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">VariableList</code><span class="sig-paren">(</span><em>variables</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#uwnet.model.VariableList" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of VariableSpec objects</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="uwnet.model.VariableSpec">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">VariableSpec</code><span class="sig-paren">(</span><em>name</em>, <em>num</em>, <em>positive=False</em>, <em>conserved=False</em>, <em>units=''</em>, <em>z_axis=-3</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#uwnet.model.VariableSpec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specification data for variable inputs</p>
-<p>This class allows passing relevant metadata such as physical units,
-dimension, and name.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="uwnet.model.call_with_numpy_dict">
-<code class="descclassname">uwnet.model.</code><code class="descname">call_with_numpy_dict</code><span class="sig-paren">(</span><em>self</em>, <em>inputs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.call_with_numpy_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call the neural network with numpy inputs</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="uwnet.model.call_with_xr">
-<code class="descclassname">uwnet.model.</code><code class="descname">call_with_xr</code><span class="sig-paren">(</span><em>self</em>, <em>ds</em>, <em>drop_times=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.call_with_xr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call the neural network with xarray inputs</p>
-</dd></dl>
-
 <dl class="function">
 <dt id="uwnet.model.get_model">
 <code class="descclassname">uwnet.model.</code><code class="descname">get_model</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>vertical_grid_size</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.get_model" title="Permalink to this definition">¶</a></dt>
@@ -398,7 +315,7 @@ dimension, and name.</p>
 <p>This project includes some modules with a more general purpose.</p>
 <span class="target" id="module-uwnet.modules"></span><dl class="class">
 <dt id="uwnet.modules.LinearDictIn">
-<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearDictIn</code><span class="sig-paren">(</span><em>inputs</em>, <em>n_out</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearDictIn" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearDictIn</code><span class="sig-paren">(</span><em>inputs</em>, <em>n_out</em>, <em>cls=&lt;class 'torch.nn.modules.linear.Linear'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearDictIn" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Dense Linear Layer Transform for dicts of tensors</p>
 <dl class="method">
 <dt id="uwnet.modules.LinearDictIn.forward">
@@ -418,7 +335,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="class">
 <dt id="uwnet.modules.LinearDictOut">
-<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearDictOut</code><span class="sig-paren">(</span><em>n_in</em>, <em>outputs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearDictOut" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearDictOut</code><span class="sig-paren">(</span><em>n_in</em>, <em>outputs</em>, <em>cls=&lt;class 'torch.nn.modules.linear.Linear'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearDictOut" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Dense Linear Layer Transform for dicts of tensors</p>
 <dl class="method">
 <dt id="uwnet.modules.LinearDictOut.forward">
@@ -443,7 +360,7 @@ registered hooks while the latter silently ignores them.</p>
 <p>Useful for representing scikit-learn affine transform functions</p>
 <dl class="method">
 <dt id="uwnet.modules.LinearFixed.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x: &lt;built-in method tensor of type object at 0x2b9dbe1efe80&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.forward" title="Permalink to this definition">¶</a></dt>
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x: &lt;built-in method tensor of type object at 0x2b9b72597e80&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -465,6 +382,58 @@ registered hooks while the latter silently ignores them.</p>
 <dt>n, m <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd>input and output dimensions</dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="uwnet.modules.MOE">
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">MOE</code><span class="sig-paren">(</span><em>m</em>, <em>n</em>, <em>n_experts</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.MOE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="uwnet.modules.MOE.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.MOE.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="uwnet.modules.Partial">
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">Partial</code><span class="sig-paren">(</span><em>fun</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.Partial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module similar to functools.partial</p>
+<p>This allows a function to be easily wrapped as a torch module. Which makes
+it compatible with nn.Sequential and easy to save/load.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="uwnet.modules.RPartial">
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">RPartial</code><span class="sig-paren">(</span><em>fun</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.RPartial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as Partial but stored args are passed after the first argument</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="uwnet.modules.ValMap">
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">ValMap</code><span class="sig-paren">(</span><em>fun</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.ValMap" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="uwnet.modules.ValMap.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.ValMap.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
 </dd></dl>
 
 </dd></dl>
