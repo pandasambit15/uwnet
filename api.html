@@ -187,12 +187,6 @@ shape (time, z, 1, 1).</p>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="uwnet.datasets.XRTimeSeries.mean">
-<code class="descname">mean</code><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.mean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mean of the contained variables</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="uwnet.datasets.XRTimeSeries.scale">
 <code class="descname">scale</code><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.scale" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -201,12 +195,6 @@ shape (time, z, 1, 1).</p>
 <dt id="uwnet.datasets.XRTimeSeries.setup_indices">
 <code class="descname">setup_indices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.setup_indices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="attribute">
-<dt id="uwnet.datasets.XRTimeSeries.std">
-<code class="descname">std</code><a class="headerlink" href="#uwnet.datasets.XRTimeSeries.std" title="Permalink to this definition">¶</a></dt>
-<dd><p>Standard deviation of the contained variables</p>
-</dd></dl>
 
 <dl class="attribute">
 <dt id="uwnet.datasets.XRTimeSeries.time_dim">
@@ -285,7 +273,7 @@ and prediction arrays along the dimension <cite>dim</cite></div></blockquote>
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-uwnet.model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="uwnet.model.InnerModel">
-<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">InnerModel</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>inputs</em>, <em>outputs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.InnerModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.model.</code><code class="descname">InnerModel</code><span class="sig-paren">(</span><em>pre</em>, <em>post</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.InnerModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inner model which operates with height along the last dimension</p>
 <dl class="method">
 <dt id="uwnet.model.InnerModel.forward">
@@ -305,7 +293,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="function">
 <dt id="uwnet.model.get_model">
-<code class="descclassname">uwnet.model.</code><code class="descname">get_model</code><span class="sig-paren">(</span><em>mean</em>, <em>scale</em>, <em>vertical_grid_size</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.get_model" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">uwnet.model.</code><code class="descname">get_model</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.model.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an MLP with scaled inputs and outputs</p>
 </dd></dl>
 
@@ -355,12 +343,12 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="class">
 <dt id="uwnet.modules.LinearFixed">
-<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearFixed</code><span class="sig-paren">(</span><em>weight</em>, <em>bias</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">LinearFixed</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed" title="Permalink to this definition">¶</a></dt>
 <dd><p>A linear tranform with fixed weights and bias</p>
 <p>Useful for representing scikit-learn affine transform functions</p>
 <dl class="method">
 <dt id="uwnet.modules.LinearFixed.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>x: &lt;built-in method tensor of type object at 0x2ad2d232ee80&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.forward" title="Permalink to this definition">¶</a></dt>
+<code class="descname">forward</code><span class="sig-paren">(</span><em>x: &lt;built-in method tensor of type object at 0x2b49b3f84e80&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -374,13 +362,13 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="classmethod">
 <dt id="uwnet.modules.LinearFixed.from_affine">
-<em class="property">classmethod </em><code class="descname">from_affine</code><span class="sig-paren">(</span><em>func</em>, <em>n</em>, <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.from_affine" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_affine</code><span class="sig-paren">(</span><em>func</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.LinearFixed.from_affine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize from an arbitrary python function</p>
 <dl class="docutils">
 <dt>func</dt>
 <dd>function has input dimension n and output dimension m</dd>
-<dt>n, m <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>input and output dimensions</dd>
+<dt>n <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>input dimensions</dd>
 </dl>
 </dd></dl>
 
@@ -392,6 +380,34 @@ registered hooks while the latter silently ignores them.</p>
 <dd><dl class="method">
 <dt id="uwnet.modules.MOE.forward">
 <code class="descname">forward</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.MOE.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="uwnet.modules.MapByKey">
+<em class="property">class </em><code class="descclassname">uwnet.modules.</code><code class="descname">MapByKey</code><span class="sig-paren">(</span><em>funcs</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.MapByKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply modules to inputs by key</p>
+<p>This code explains the how this module works:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">funcs</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">funcs</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mapbykey</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">})</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="uwnet.modules.MapByKey.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.MapByKey.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -440,8 +456,10 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="function">
 <dt id="uwnet.modules.get_affine_transforms">
-<code class="descclassname">uwnet.modules.</code><code class="descname">get_affine_transforms</code><span class="sig-paren">(</span><em>func</em>, <em>n</em>, <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.get_affine_transforms" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">uwnet.modules.</code><code class="descname">get_affine_transforms</code><span class="sig-paren">(</span><em>func</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#uwnet.modules.get_affine_transforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get weights matrix and bias of an affine function</p>
+<p>func(I) = A + b
+func(0) = b</p>
 </dd></dl>
 
 </div>
