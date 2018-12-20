@@ -140,14 +140,14 @@ def total_loss(criterion, model, z, batch, time_step=.125):
     loss = l1 + l2 * .1
 
     # WTG penalty
-    eig1, eig2 = wtg_penalty(model, z, batch)
+    # eig1, eig2 = wtg_penalty(model, z, batch)
 
     info = {
         'Q1/Q2': l1.item(),
         'equilibrium': l2.item(),
         # 'pw_imbalance': l3.item(),
-        'eig1': eig1,
-        'eig2': eig2,
+        # 'eig1': eig1,
+        # 'eig2': eig2,
         'total': loss.item()
     }
 

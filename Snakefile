@@ -178,3 +178,10 @@ rule train_model:
     python -m uwnet.train with data={TRAINING_DATA} prepost.path={input} prepost.kind='saved' \
         batch_size=64 lr=.005 epochs=5 -m uwnet
     """
+
+
+rule train_model1:
+    shell: """
+    python -m uwnet.train with data={TRAINING_DATA} prepost.path={input} prepost.kind='orig' \
+        batch_size=64 lr=.005 epochs=5 -m uwnet
+    """

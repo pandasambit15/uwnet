@@ -8,6 +8,9 @@ import logging
 from toolz import valmap
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_models():
     """Load the specified torch models
 
@@ -113,9 +116,12 @@ def expand_lower_atmosphere(sam_state, nn_output, n_in, n_out):
     return out
 
 
-def call_neural_network(state):
+def print_max_min(key, d):
+    val = d[key]
+    logger.info(f"{key} max/min: {val.min()}, {val.max()}")
 
-    logger = logging.getLogger(__name__)
+
+def call_neural_network(state):
 
     # Pre-process the inputs
     # ----------------------
@@ -133,17 +139,17 @@ def call_neural_network(state):
     for model in MODELS:
         logger.info(f"Calling NN")
         nz = 34 #len(model.heights)
-        lower_atmos_kwargs = get_lower_atmosphere(kwargs, nz)
+        # lower_atmos_kwargs = get_lower_atmosphere(kwargs, nz)
 
-        # add a singleton dimension and convert to float32
-        lower_atmos_kwargs = {key: val[np.newaxis].astype(np.float32) for key,
-                              val in lower_atmos_kwargs.items()}
+        # # add a singleton dimension and convert to float32
+        # lower_atmos_kwargs = {key: val[np.newaxis].astype(np.float32) for key,
+        #                       val in lower_atmos_kwargs.items()}
         # call the neural network
-        out = call_with_numpy_dict(model, lower_atmos_kwargs)
+        out = call_with_numpy_dict(model, kwargs)
         # remove the singleton first dimension
         out = valmap(np.squeeze, out)
-        out = expand_lower_atmosphere(
-            state, out, n_in=nz, n_out=state['QT'].shape[0])
+        # out = expand_lower_atmosphere(
+        #     state, out, n_in=nz, n_out=state['SLI'].shape[0])
 
         renamed = {}
         for key in out:
@@ -153,6 +159,10 @@ def call_neural_network(state):
 
     # update the state
     state.update(merged_outputs)
+    torch.save(kwargs, "debug.pkl")
+
+    print_max_min('FQVNN', state)
+    print_max_min('FSLINN', state)
 
     # Debugging info below here
     # -------------------------

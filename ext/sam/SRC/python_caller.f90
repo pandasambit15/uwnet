@@ -109,7 +109,7 @@ contains
   end subroutine initialize_from_target
 
   subroutine push_state()
-    use vars, only: t, u, v,w, tabs,&
+    use vars, only: qv, t, u, v,w, tabs,&
          shf_xy, lhf_xy, sstxy, t00, prec_xy,&
          latitude, longitude,&
          nx, ny, nzm, rho, adz, dz, pres, presi, time, nstep, day, caseid, case, nz, dtn,&
@@ -138,6 +138,9 @@ contains
 
     tmp = micro_field(1:nx,1:ny,1:nzm, 1) * 1.e3
     call set_state("QT", tmp)
+
+    tmp = qv * 1.e3
+    call set_state("QV", tmp)
 
     tmp =  tabs(1:nx,1:ny,1:nzm)
     call set_state("TABS", tmp)
@@ -235,7 +238,7 @@ contains
     micro_field(1:nx, 1:ny, 1:nzm, 1) = tmp
 
 
-    call get_state("FQTNN", tmp, nx * ny * nzm)
+    call get_state("FQVNN", tmp, nx * ny * nzm)
     ! tmp(:,:,ntop:nzm) = t(1:nx,1:ny, ntop:nzm)
     print *, 'SUM OF FQTNN ', sum(tmp**2)
     fqtnn(1:nx, js:jn, 1:nzm) = tmp(:,js:jn,:)

@@ -81,7 +81,7 @@ def my_config():
     min_output_interval = 0
     output_dir = None
 
-    prognostics = ['QT', 'SLI']
+    prognostics = ['QV', 'SLI']
     single_column_locations= [(32, 0)]
     prepost = dict(
         kind='pca',
@@ -97,6 +97,8 @@ def get_dataset(data):
         dataset = xr.open_dataset(data)
 
     try:
+        dt = round(float(dataset.step.diff('step')*86400))
+        dataset['FQV'] = dataset.QV.diff('step').isel(step=0)/dt
         return dataset.isel(step=0).drop('step').drop('p')
     except:
         return dataset
@@ -104,7 +106,7 @@ def get_dataset(data):
 
 def water_budget_plots(model, ds, location, filenames):
     nt = min(len(ds.time), 190)
-    prognostics=['QT', 'SLI']
+    prognostics=['QV', 'SLI']
     scm_data = single_column_simulation(model, location, interval=(0, nt - 1),
                                         prognostics=prognostics)
     merged_pred_data = location.rename({
@@ -159,7 +161,7 @@ class plot_q2(Plot):
     name = 'q2_{}.png'
 
     def plot(self, location, output, ax):
-        return output.QT.plot(x='time', ax=ax)
+        return output.QV.plot(x='time', ax=ax)
 
 
 class plot_scatter_q2_fqt(Plot):
@@ -168,7 +170,7 @@ class plot_scatter_q2_fqt(Plot):
     def plot(self, location, output, ax):
         x, y, z = [
             x.values.ravel()
-            for x in xr.broadcast(location.FQT * 86400, output.QT, output.z)
+            for x in xr.broadcast(location.FQV * 86400, output.QV, output.z)
         ]
         im = ax.scatter(x, y, c=z)
         plt.colorbar(im, ax=ax)
@@ -396,8 +398,8 @@ class Trainer(object):
         subset = self.dataset_subset.isel(time=slice(0, None, 20))
         out = self.model.call_with_xr(subset)
         pme = (subset.Prec- lhf_to_evap(subset.LHF)).mean(['time', 'x'])
-        pmenn = - (mass * out.QT).sum('z')/1000
-        pmefqt = ((mass * subset.FQT).sum('z')/1000*86400).mean(['time', 'x'])
+        pmenn = - (mass * out.QV).sum('z')/1000
+        pmefqt = ((mass * subset.FQV).sum('z')/1000*86400).mean(['time', 'x'])
         pmenn = pmenn.mean(['time', 'x'])
         plotme = xr.Dataset({'truth': pme, 'nn': pmenn, 'fqt':
                             pmefqt}).to_array(dim='var')

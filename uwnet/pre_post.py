@@ -67,14 +67,14 @@ def fit_scaler_transform(x):
 def get_post(data, m=20):
     logger.info("Fitting PCA models for outputs")
     q1 = compute_apparent_source(data.SLI, data.FSLI * 86400).dropna('time')
-    q2 = compute_apparent_source(data.QT, data.FQT * 86400).dropna('time')
+    q2 = compute_apparent_source(data.QV, data.FQV * 86400).dropna('time')
 
     ds = xr.Dataset({'Q1': q1, 'Q2': q2})
     df = prepare_data(ds, exog=['Q1', 'Q2'])
 
     funcs = {
         'SLI': fit_pca_inverse_transform(df['Q1'], m),
-        'QT': fit_pca_inverse_transform(df['Q2'], m),
+        'QV': fit_pca_inverse_transform(df['Q2'], m),
     }
 
     return MapByKey(funcs)
@@ -82,7 +82,7 @@ def get_post(data, m=20):
 
 def get_pre(data, m=20):
     logger.info("Building preprocessing module")
-    keys = ['QT', 'SLI', 'SHF', 'LHF', 'SOLIN', 'SST']
+    keys = ['QV', 'SLI', 'SHF', 'LHF', 'SOLIN', 'SST']
     df = prepare_data(data, exog=keys)
     transformers = {}
     for key in keys:
@@ -109,7 +109,7 @@ class Post(nn.Module):
 
     def forward(self, d):
         q0 = self.q0.clamp(max=1)
-        d['QT'] = d['QT'] * q0
+        d['QV'] = d['QV'] * q0
         return d
 
 
@@ -118,7 +118,7 @@ class LowerAtmosInput(nn.Module):
     @property
     def outputs(self):
         return [
-            ('QT', 15),
+            ('QV', 15),
             ('SLI', 18),
             ('SST', 1),
             ('SOLIN', 1),
@@ -153,15 +153,15 @@ class Sequential(nn.Sequential):
 
 def get_pre_post_orig(dataset, n):
     from .normalization import get_mean_scale, Scaler
-    inputs = [('QT', n), ('SLI', n),
+    inputs = [('QV', n), ('SLI', n),
               ('SST', 1), ('SOLIN', 1)]
     mean, scale  = get_mean_scale(dataset)
     scaler = Scaler(mean, scale)
     scaler.outputs = inputs
     scaler.inputs = inputs
     # post processor
-    outputs = (('QT', n), ('SLI', n))
-    post = Post(scale['QT'], outputs)
+    outputs = (('QV', n), ('SLI', n))
+    post = Post(scale['QV'], outputs)
     return scaler, post
 
 
@@ -171,10 +171,12 @@ def get_pre_post(data, _config):
     if kind == 'pca':
         return get_pre(data, m=20), get_post(data, m=20)
     elif kind == 'orig':
-        return get_pre_post_orig(data, *args)
+        n = _config.get('n', len(data.z))
+        logger.info(f"Original Prepost: using {n} levels")
+        return get_pre_post_orig(data, n)
     elif kind == 'mix':
         pre = get_pre(data, m=20)
-        _ , post= get_pre_post_orig(data, *args)
+        _ , post= get_pre_post_orig(data)
         return pre, post
     elif kind == 'saved':
         path = _config['path']
